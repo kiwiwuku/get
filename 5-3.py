@@ -10,6 +10,7 @@ comp = 14
 troyka = 13
 
 GPIO.setup(dac, GPIO.OUT)
+GPIO.setup(led, GPIO.OUT)
 GPIO.setup(troyka, GPIO.OUT, initial=GPIO.HIGH)
 GPIO.setup(comp, GPIO.IN)
 
@@ -17,14 +18,18 @@ def dec2bin(num):
     return [int(elem) for elem in bin(num)[2:].zfill(8)]
 
 def adc():
-    k = 0
-    for i in range(7, -1, -1):
-        k += 2**i
-        dac_val = dec2bin(k)
+    k = 2**7
+    for i in range(6, 0, -1):
+        temp = k + 2**i
+
+        dac_val = [int(elem) for elem in bin(temp)[2:].zfill(8)]
         GPIO.output(dac, dac_val)
-        sleep(0.002)
+        sleep(0.006)
         comp_val = GPIO.input(comp)
+
         if comp_val == 0:
+            k = temp
+        else:
             k -= 2**i
     return k
 

@@ -19,7 +19,7 @@ def adc():
     k = 0
     for i in range(7, -1, -1):
         k += 2**i
-        dac_val = dec2bin(k)
+        dac_val = [int(elem) for elem in bin(k)[2:].zfill(8)]
         GPIO.output(dac, dac_val)
         sleep(0.006)
         comp_val = GPIO.input(comp)
@@ -27,9 +27,24 @@ def adc():
             k -= 2**i
     return k
 
+def adc2():
+    k = 2**7
+    for i in range(6, 0, -1):
+        temp = k + 2**i
+
+        dac_val = [int(elem) for elem in bin(temp)[2:].zfill(8)]
+        GPIO.output(dac, dac_val)
+        sleep(0.006)
+        comp_val = GPIO.input(comp)
+
+        if comp_val == 0:
+            k = temp
+        else:
+            k -= 2**i
+    return k
 try:
     while True:
-        i = adc()
+        i = adc2()
         voltage = i * 3.3 / 256.0
         print("i = " + str(i) + "; voltage = " + str(voltage))
 finally:
